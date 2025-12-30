@@ -29,7 +29,7 @@ namespace WebApiEcomm.InfraStructure.Data
 
 
             modelBuilder.Entity<AppUser>()
-                .HasOne(u => u.address)
+                .HasOne(u => u.UserAddress)
                 .WithOne(a => a.AppUser)
                 .HasForeignKey<Address>(a => a.AppUserId);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);

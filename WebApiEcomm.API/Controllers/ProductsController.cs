@@ -1,22 +1,25 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApiEcomm.API.Helper;
 using WebApiEcomm.Core.Entites.Dtos;
+using WebApiEcomm.Core.Entites.Identity;
 using WebApiEcomm.Core.Interfaces.IUnitOfWork;
 using WebApiEcomm.Core.Services;
 using WebApiEcomm.Core.Sharing;
 
 namespace WebApiEcomm.API.Controllers
 {
-    public class productsController : BaseController
+    public class ProductsController : BaseController
     {
         private readonly IImageManagementService imageManagementService;
-        public productsController(IUnitOfWork work, IMapper mapper, IImageManagementService imageManagementService) : base(work, mapper)
+        public ProductsController(IUnitOfWork work, IMapper mapper, IImageManagementService imageManagementService) : base(work, mapper)
         {
             this.imageManagementService = imageManagementService;
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllProducts([FromQuery]ProductParams productParams)
         {
             try
@@ -26,7 +29,7 @@ namespace WebApiEcomm.API.Controllers
                     .ProductRepository
                     .GetAllAsync(productParams);
                 var totalCount = await _work.ProductRepository.CountAsync();
-                return Ok(new Pagination<ProductDto>(productParams.PageNumber , productParams.PageSize , totalCount , Product));
+                return Ok(new PagedResponse<ProductDto>(productParams.Page, productParams.PageSize, totalCount, Product));
                 
             }
             catch (Exception ex)
@@ -36,6 +39,7 @@ namespace WebApiEcomm.API.Controllers
         }
 
         [HttpGet("{productId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetProductById(int productId)
         {
             try
@@ -61,6 +65,7 @@ namespace WebApiEcomm.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddProduct(AddProductDto productdto)
         {
             try
@@ -79,6 +84,7 @@ namespace WebApiEcomm.API.Controllers
         }
 
         [HttpPut("{productId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int productId, UpdateProductDto updateProductDTO)
         {
             try
@@ -93,6 +99,7 @@ namespace WebApiEcomm.API.Controllers
             }
         }
         [HttpDelete("{productId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> delete(int productId)
         {
             try

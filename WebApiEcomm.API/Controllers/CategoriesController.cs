@@ -1,30 +1,44 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApiEcomm.API.Helper;
 using WebApiEcomm.Core.Entites.Dtos;
 using WebApiEcomm.Core.Entites.Product;
 using WebApiEcomm.Core.Interfaces.IUnitOfWork;
+using WebApiEcomm.Core.Sharing;
 
 namespace WebApiEcomm.API.Controllers
 {
-    public class categoriesController : BaseController
+    public class CategoriesController : BaseController
     {
-        public categoriesController(IUnitOfWork work, IMapper mapper) : base(work, mapper)
+        public CategoriesController(IUnitOfWork work, IMapper mapper) : base(work, mapper)
         {
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCategories()
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllCategories([FromQuery] PaginationParams paginationParams)
         {
             try
             {
-                var categories = await _work.CategoryRepository.GetAllAsync();
-                if (categories == null || !categories.Any())
+                var allCategories = await _work.CategoryRepository.GetAllAsync();
+                if (allCategories == null || !allCategories.Any())
                 {
-                    return BadRequest(new ResponseApi(400));
+                    return Ok(new PagedResponse<CategoryDto>(paginationParams.Page, paginationParams.PageSize, 0, new List<CategoryDto>()));
                 }
-                return Ok(categories);
+
+                // Map to DTOs
+                var categoryDtos = mapper.Map<IEnumerable<CategoryDto>>(allCategories);
+
+                // Apply pagination
+                var totalCount = categoryDtos.Count();
+                var paginatedCategories = categoryDtos
+                    .Skip((paginationParams.Page - 1) * paginationParams.PageSize)
+                    .Take(paginationParams.PageSize)
+                    .ToList();
+
+                return Ok(new PagedResponse<CategoryDto>(paginationParams.Page, paginationParams.PageSize, totalCount, paginatedCategories));
             }
             catch (Exception ex)
             {
@@ -32,6 +46,7 @@ namespace WebApiEcomm.API.Controllers
             }
         }
         [HttpGet("{categoryId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetCategoryById(int categoryId)
         {
             try
@@ -49,6 +64,7 @@ namespace WebApiEcomm.API.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateCategory(CategoryDto categorydto)
         {
             if (categorydto == null)
@@ -67,6 +83,7 @@ namespace WebApiEcomm.API.Controllers
             }
         }
         [HttpPut("{categoryId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateCategory(int categoryId, UpdateCategoryDto updatecategorydto)
         { 
             try
@@ -82,6 +99,7 @@ namespace WebApiEcomm.API.Controllers
             }
         }
         [HttpDelete("{categoryId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int categoryId)
         {
             if(categoryId <= 0)

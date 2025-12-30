@@ -97,5 +97,10 @@ namespace WebApiEcomm.InfraStructure.Repositores
             }
             return user;
         }
+
+        public async Task<bool> CheckEmailExistsAsync(string email)
+        {
+            return await _userManager.FindByEmailAsync(email) != null;
+        }
     }
 }

@@ -21,7 +21,7 @@ namespace WebApiEcomm.UnitTests.API.Controllers
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<ICategoryRepository> _mockCategoryRepo;
         private Mock<IMapper> _mockMapper;
-        private categoriesController _controller;
+        private CategoriesController _controller;
 
         [SetUp]
         public void Setup()
@@ -32,7 +32,7 @@ namespace WebApiEcomm.UnitTests.API.Controllers
 
             _mockUnitOfWork.Setup(u => u.CategoryRepository).Returns(_mockCategoryRepo.Object);
 
-            _controller = new categoriesController(_mockUnitOfWork.Object, _mockMapper.Object);
+            _controller = new CategoriesController(_mockUnitOfWork.Object, _mockMapper.Object);
         }
 
         [Test]

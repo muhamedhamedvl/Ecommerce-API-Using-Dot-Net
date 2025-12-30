@@ -16,13 +16,13 @@ namespace WebApiEcomm.UnitTests.API.Controllers
     public class ordersControllerTests
     {
         private Mock<IOrderService> _orderServiceMock;
-        private ordersController _controller;
+        private OrdersController _controller;
 
         [SetUp]
         public void Setup()
         {
             _orderServiceMock = new Mock<IOrderService>();
-            _controller = new ordersController(_orderServiceMock.Object);
+            _controller = new OrdersController(_orderServiceMock.Object);
 
             var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {

@@ -1,19 +1,21 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WebApiEcomm.API.Helper;
 using WebApiEcomm.Core.Entites.Dtos;
 using WebApiEcomm.Core.Entites.Order;
 using WebApiEcomm.Core.Services;
+using WebApiEcomm.Core.Sharing;
 
 namespace WebApiEcomm.API.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
-    public class ordersController : ControllerBase
+    public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        public ordersController(IOrderService orderService)
+        public OrdersController(IOrderService orderService)
         {
             _orderService = orderService;
         }
@@ -29,16 +31,24 @@ namespace WebApiEcomm.API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<OrderToReturnDTO>>> getorders()
+        public async Task<ActionResult> GetOrders([FromQuery] PaginationParams paginationParams)
         {
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
-            var order = await _orderService.GetAllOrdersForUserAsync(email);
-            return Ok(order);
+            var orders = await _orderService.GetAllOrdersForUserAsync(email);
+            
+            // Apply pagination
+            var totalCount = orders.Count();
+            var paginatedOrders = orders
+                .Skip((paginationParams.Page - 1) * paginationParams.PageSize)
+                .Take(paginationParams.PageSize)
+                .ToList();
+            
+            return Ok(new PagedResponse<OrderToReturnDTO>(paginationParams.Page, paginationParams.PageSize, totalCount, paginatedOrders));
         }
 
 
         [HttpGet("{orderId}")]
-        public async Task<ActionResult<OrderToReturnDTO>> getOrderById(int orderId)
+        public async Task<ActionResult<OrderToReturnDTO>> GetOrderById(int orderId)
         {
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
             var order = await _orderService.GetOrderByIdAsync(orderId, email);

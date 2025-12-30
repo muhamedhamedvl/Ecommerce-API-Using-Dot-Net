@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApiEcomm.API.Helper;
@@ -7,10 +8,10 @@ using WebApiEcomm.Core.Interfaces.IUnitOfWork;
 
 namespace WebApiEcomm.API.Controllers
 {
-
-    public class basketController : BaseController
+    [Authorize]
+    public class BasketController : BaseController
     {
-        public basketController(IUnitOfWork work, IMapper mapper) : base(work, mapper)
+        public BasketController(IUnitOfWork work, IMapper mapper) : base(work, mapper)
         {
         }
 		[HttpGet("{basketId}")]

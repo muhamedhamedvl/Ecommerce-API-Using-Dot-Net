@@ -1,30 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WebApiEcomm.Core.Sharing
+﻿namespace WebApiEcomm.Core.Sharing
 {
-    public class ProductParams
+    public class ProductParams : PaginationParams
     {
-        //  string sort , int? CategoryId , int PageSize , int PageNumber
-        public string sort {  get; set; }
+        public string sort { get; set; }
+        public int? CategoryId { get; set; }
+        public string Search { get; set; }
 
-        public int? CategoryId {  get; set; }
-
-        //Smart Search
-        public string Search {  get; set; }
-        public int MaxPageSize { get; set; } = 6;
-
-        private int _PageSize = 3;
-
-        public int PageSize
+        // Keep PageNumber for backward compatibility
+        public int PageNumber
         {
-            get { return _PageSize; }
-            set { _PageSize = value > MaxPageSize ? MaxPageSize : value; }
+            get => Page;
+            set => Page = value;
         }
-        public int PageNumber { get; set; } = 1;
-
     }
 }

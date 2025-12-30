@@ -23,7 +23,7 @@ namespace WebApiEcomm.UnitTests.API.Controllers
         private Mock<IMapper> _mockMapper;
         private Mock<IImageManagementService> _mockImageService;
 
-        private productsController _controller;
+        private ProductsController _controller;
 
         [SetUp]
         public void SetUp()
@@ -36,7 +36,7 @@ namespace WebApiEcomm.UnitTests.API.Controllers
             // Wire repo to unit of work
             _mockUnitOfWork.Setup(u => u.ProductRepository).Returns(_mockProductRepo.Object);
 
-            _controller = new productsController(
+            _controller = new ProductsController(
                 _mockUnitOfWork.Object,
                 _mockMapper.Object,
                 _mockImageService.Object

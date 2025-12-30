@@ -16,7 +16,7 @@ namespace WebApiEcomm.UnitTests.API.Controllers
     {
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<ICustomerBasketRepository> _mockBasketRepo;
-        private basketController _controller;
+        private BasketController _controller;
 
         [SetUp]
         public void Setup()
@@ -26,7 +26,7 @@ namespace WebApiEcomm.UnitTests.API.Controllers
             _mockUnitOfWork.Setup(u => u.CustomerBasketRepository).Returns(_mockBasketRepo.Object);
 
             var mockMapper = new Mock<IMapper>();
-            _controller = new basketController(_mockUnitOfWork.Object, mockMapper.Object);
+            _controller = new BasketController(_mockUnitOfWork.Object, mockMapper.Object);
         }
 
         [Test]

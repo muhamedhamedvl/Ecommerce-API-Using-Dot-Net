@@ -7,12 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using WebApiEcomm.Core.Interfaces.IUnitOfWork;
 using WebApiEcomm.Core.Interfaces;
+using WebApiEcomm.Core.Interfaces.Auth;
 using WebApiEcomm.InfraStructure.Data;
 using Microsoft.EntityFrameworkCore;
 using WebApiEcomm.InfraStructure.Repositores.UnitOfWork;
 using WebApiEcomm.InfraStructure.Repositories;
 using WebApiEcomm.Core.Services;
 using WebApiEcomm.InfraStructure.Repositores.Service;
+using WebApiEcomm.InfraStructure.Repositores;
 using Microsoft.Extensions.FileProviders;
 using StackExchange.Redis;
 
@@ -25,6 +27,7 @@ namespace WebApiEcomm.InfraStructure
             services.AddScoped(typeof(GenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IAuth, AuthRepository>();
             services.AddSingleton<IImageManagementService, ImageManagementService>();
             services.AddScoped<IGenrateToken, GenrateToken>();
             services.AddScoped<IPaymentService, PaymentService>();
