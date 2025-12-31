@@ -19,6 +19,26 @@ namespace WebApiEcomm.InfraStructure.Data.Config
             builder.Property(x => x.NewPrice).HasColumnType("decimal(18,2)");
             builder.Property(x => x.OldPrice).HasColumnType("decimal(18,2)");
 
+            builder.HasData(
+                new Product
+                {
+                    Id = 1,
+                    Name = "Smartphone",
+                    Description = "Latest model with advanced features",
+                    OldPrice = 799.99m,
+                    NewPrice = 699.99m,
+                    CategoryId = 1
+                },
+                new Product
+                {
+                    Id = 2,
+                    Name = "Laptop",
+                    Description = "High performance laptop for professionals",
+                    OldPrice = 1499.99m,
+                    NewPrice = 1299.99m,
+                    CategoryId = 1
+                }
+            );
         }
     }
 }

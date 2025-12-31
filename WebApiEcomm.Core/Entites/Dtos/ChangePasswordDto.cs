@@ -1,15 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApiEcomm.Core.Entites.Dtos
 {
-    public record ResetPasswordDto
+    public record ChangePasswordDto
     {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
-        public string Email { get; init; }
-
-        [Required(ErrorMessage = "Token is required")]
-        public string Token { get; init; }
+        [Required(ErrorMessage = "Current password is required")]
+        public string CurrentPassword { get; init; }
 
         [Required(ErrorMessage = "New password is required")]
         [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]

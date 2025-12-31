@@ -155,5 +155,142 @@ namespace WebApiEcomm.API.Controllers
 
             return await _authService.CheckEmailExistsAsync(email);
         }
+
+        /// <summary>
+        /// Request password reset email
+        /// </summary>
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            try
+            {
+                var message = await _authService.ForgotPasswordAsync(forgotPasswordDto.Email);
+                return Ok(new { message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ResponseApi(400, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResponseApi(500, $"Internal server error: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Reset password using reset token
+        /// </summary>
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            try
+            {
+                await _authService.ResetPasswordAsync(resetPasswordDto);
+                return Ok(new { message = "Password has been reset successfully" });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ResponseApi(400, ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new ResponseApi(400, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResponseApi(500, $"Internal server error: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Change password for authenticated user
+        /// </summary>
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
+        {
+            try
+            {
+                var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new ResponseApi(401, "User not authenticated"));
+                }
+
+                await _authService.ChangePasswordAsync(email, changePasswordDto);
+                return Ok(new { message = "Password has been changed successfully" });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ResponseApi(400, ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new ResponseApi(400, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResponseApi(500, $"Internal server error: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Confirm user email
+        /// </summary>
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto confirmEmailDto)
+        {
+            try
+            {
+                await _authService.ConfirmEmailAsync(confirmEmailDto.Email, confirmEmailDto.Token);
+                return Ok(new { message = "Email has been confirmed successfully" });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ResponseApi(400, ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new ResponseApi(400, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResponseApi(500, $"Internal server error: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Resend email confirmation
+        /// </summary>
+        [HttpGet("resend-confirmation-email")]
+        [Authorize]
+        public async Task<IActionResult> ResendConfirmationEmail()
+        {
+            try
+            {
+                var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new ResponseApi(401, "User not authenticated"));
+                }
+
+                await _authService.ResendConfirmationEmailAsync(email);
+                return Ok(new { message = "Confirmation email has been sent" });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ResponseApi(400, ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new ResponseApi(400, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResponseApi(500, $"Internal server error: {ex.Message}"));
+            }
+        }
     }
 }

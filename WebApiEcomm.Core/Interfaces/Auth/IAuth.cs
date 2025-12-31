@@ -8,5 +8,10 @@ namespace WebApiEcomm.Core.Interfaces.Auth
         Task<AppUser> RegisterAsync(RegisterDto registerDto);
         Task<AppUser> LoginAsync(LoginDto loginDto);
         Task<bool> CheckEmailExistsAsync(string email);
+        Task<string> ForgotPasswordAsync(string email);
+        Task ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
+        Task ChangePasswordAsync(string email, ChangePasswordDto changePasswordDto);
+        Task ConfirmEmailAsync(string email, string token);
+        Task ResendConfirmationEmailAsync(string email);
     }
 }

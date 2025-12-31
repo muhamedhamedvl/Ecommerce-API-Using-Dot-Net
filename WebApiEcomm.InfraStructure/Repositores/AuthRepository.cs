@@ -102,5 +102,153 @@ namespace WebApiEcomm.InfraStructure.Repositores
         {
             return await _userManager.FindByEmailAsync(email) != null;
         }
+
+        public async Task<string> ForgotPasswordAsync(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email), "Email is required");
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            
+            // For security reasons, don't reveal if user exists or not
+            // But still generate and send token if user exists
+            if (user == null)
+            {
+                // Return success message without revealing user doesn't exist
+                return "If an account with that email exists, a password reset link has been sent.";
+            }
+
+            // Generate password reset token
+            string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Send password reset email
+            string emailContent = $@"
+                <h2>Password Reset Request</h2>
+                <p>Hello {user.DisplayName ?? user.UserName},</p>
+                <p>You requested to reset your password. Please use the following token to reset your password:</p>
+                <p><strong>Token:</strong> {resetToken}</p>
+                <p>This token will expire in 24 hours.</p>
+                <p>If you did not request this reset, please ignore this email.</p>
+            ";
+
+            await SendEmail(
+                user.Email, 
+                resetToken, 
+                "Password Reset", 
+                emailContent, 
+                "Reset your password using the token provided above");
+
+            return "If an account with that email exists, a password reset link has been sent.";
+        }
+
+        public async Task ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        {
+            if (resetPasswordDto == null)
+            {
+                throw new ArgumentNullException(nameof(resetPasswordDto));
+            }
+
+            var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+            if (user == null)
+            {
+                throw new ArgumentException("Invalid password reset request");
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
+            
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new InvalidOperationException($"Password reset failed: {errors}");
+            }
+        }
+
+        public async Task ChangePasswordAsync(string email, ChangePasswordDto changePasswordDto)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email), "Email is required");
+            }
+
+            if (changePasswordDto == null)
+            {
+                throw new ArgumentNullException(nameof(changePasswordDto));
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new ArgumentException("User not found");
+            }
+
+            var result = await _userManager.ChangePasswordAsync(
+                user, 
+                changePasswordDto.CurrentPassword, 
+                changePasswordDto.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new InvalidOperationException($"Password change failed: {errors}");
+            }
+        }
+
+        public async Task ConfirmEmailAsync(string email, string token)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email), "Email is required");
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new ArgumentNullException(nameof(token), "Token is required");
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new ArgumentException("User not found");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new InvalidOperationException($"Email confirmation failed: {errors}");
+            }
+        }
+
+        public async Task ResendConfirmationEmailAsync(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email), "Email is required");
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new ArgumentException("User not found");
+            }
+
+            if (user.EmailConfirmed)
+            {
+                throw new InvalidOperationException("Email is already confirmed");
+            }
+
+            // Generate new confirmation token
+            string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            
+            await SendEmail(
+                user.Email, 
+                code, 
+                "Email Confirmation", 
+                "Please confirm your email", 
+                "Confirm your email by using the token provided");
+        }
     }
 }

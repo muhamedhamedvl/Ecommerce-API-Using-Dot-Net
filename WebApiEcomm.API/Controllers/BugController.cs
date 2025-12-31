@@ -32,9 +32,9 @@ namespace WebApiEcomm.API.Controllers
         }
 
         /// <summary>
-        /// Simulates a 500 Inter
-        [HttpGet("server-erronal Server Error.")]
-        /// </summary>r")]
+        /// Simulates a 500 Internal Server Error.
+        /// </summary>
+        [HttpGet("server-error")]
         public async Task<IActionResult> GetServerError()
         {
             var category = await _work.CategoryRepository.GetByIdAsync(100);

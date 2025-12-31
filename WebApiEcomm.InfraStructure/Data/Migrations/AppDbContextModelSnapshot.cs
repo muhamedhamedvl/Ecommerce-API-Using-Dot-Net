@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiEcomm.InfraStructure.Data;
 
@@ -12,11 +11,9 @@ using WebApiEcomm.InfraStructure.Data;
 namespace WebApiEcomm.InfraStructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250816213103_add_PaymentIntentId")]
-    partial class add_PaymentIntentId
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,6 +207,10 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -251,12 +252,20 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -361,7 +370,7 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Image")
+                    b.Property<string>("MainImage")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -371,7 +380,7 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int>("ProductItemId")
                         .HasColumnType("int");
 
                     b.Property<string>("ProductName")
@@ -379,7 +388,7 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("Quntity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -487,6 +496,26 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoryId = 1,
+                            Description = "Latest model with advanced features",
+                            Name = "Smartphone",
+                            NewPrice = 699.99m,
+                            OldPrice = 799.99m
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CategoryId = 1,
+                            Description = "High performance laptop for professionals",
+                            Name = "Laptop",
+                            NewPrice = 1299.99m,
+                            OldPrice = 1499.99m
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -543,7 +572,7 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
             modelBuilder.Entity("WebApiEcomm.Core.Entites.Identity.Address", b =>
                 {
                     b.HasOne("WebApiEcomm.Core.Entites.Identity.AppUser", "AppUser")
-                        .WithOne("Address")
+                        .WithOne("UserAddress")
                         .HasForeignKey("WebApiEcomm.Core.Entites.Identity.Address", "AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -559,7 +588,7 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("WebApiEcomm.Core.Entites.Order.ShippingAddressDto", "shippingaddress", b1 =>
+                    b.OwnsOne("WebApiEcomm.Core.Entites.Order.ShippingAddress", "shippingAddress", b1 =>
                         {
                             b1.Property<int>("OrderId")
                                 .HasColumnType("int");
@@ -571,6 +600,9 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
                             b1.Property<string>("FirstName")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Id")
+                                .HasColumnType("int");
 
                             b1.Property<string>("LastName")
                                 .IsRequired()
@@ -598,14 +630,14 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
 
                     b.Navigation("deliveryMethod");
 
-                    b.Navigation("shippingaddress")
+                    b.Navigation("shippingAddress")
                         .IsRequired();
                 });
 
             modelBuilder.Entity("WebApiEcomm.Core.Entites.Order.OrderItem", b =>
                 {
                     b.HasOne("WebApiEcomm.Core.Entites.Order.Order", null)
-                        .WithMany("OrderItems")
+                        .WithMany("orderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -632,13 +664,13 @@ namespace WebApiEcomm.InfraStructure.Data.Migrations
 
             modelBuilder.Entity("WebApiEcomm.Core.Entites.Identity.AppUser", b =>
                 {
-                    b.Navigation("Address")
+                    b.Navigation("UserAddress")
                         .IsRequired();
                 });
 
             modelBuilder.Entity("WebApiEcomm.Core.Entites.Order.Order", b =>
                 {
-                    b.Navigation("OrderItems");
+                    b.Navigation("orderItems");
                 });
 
             modelBuilder.Entity("WebApiEcomm.Core.Entites.Product.Product", b =>

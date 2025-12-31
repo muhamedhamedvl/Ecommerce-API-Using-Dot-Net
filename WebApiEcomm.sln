@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiEcomm.InfraStructure"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiEcomm.API", "WebApiEcomm.API\WebApiEcomm.API.csproj", "{3EDFC636-5435-487E-817E-D669B6B775A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiEcomm.UnitTests", "WebApiEcomm.UnitTests\WebApiEcomm.UnitTests.csproj", "{706D7662-8669-4DD8-BA3D-654F1AAFDE70}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,10 +29,6 @@ Global
 		{3EDFC636-5435-487E-817E-D669B6B775A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EDFC636-5435-487E-817E-D669B6B775A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EDFC636-5435-487E-817E-D669B6B775A0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{706D7662-8669-4DD8-BA3D-654F1AAFDE70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{706D7662-8669-4DD8-BA3D-654F1AAFDE70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{706D7662-8669-4DD8-BA3D-654F1AAFDE70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{706D7662-8669-4DD8-BA3D-654F1AAFDE70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,7 +37,6 @@ Global
 		{24F75CD7-DFDB-48FB-B97E-9B8BE2F1B013} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{AC151C26-4070-4F14-965E-B207A74A40CA} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{3EDFC636-5435-487E-817E-D669B6B775A0} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{706D7662-8669-4DD8-BA3D-654F1AAFDE70} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C994A27-546F-4DA6-911B-5CF0A745D067}

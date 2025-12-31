@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /WebApiEcomm.API/appsettings.json
 *.editorconfig
+verbose_output.txt

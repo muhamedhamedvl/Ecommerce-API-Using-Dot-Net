@@ -39,7 +39,10 @@ namespace WebApiEcomm.InfraStructure.Data
                         UserName = "admin",
                         Email = "admin@ecommerce.com",
                         DisplayName = "System Administrator",
-                        EmailConfirmed = true
+                        EmailConfirmed = true,
+                        City = "Cairo",
+                        State = "Cairo",
+                        ZipCode = "12345"
                     };
 
                     var result = await userManager.CreateAsync(adminUser, "Admin@123");
