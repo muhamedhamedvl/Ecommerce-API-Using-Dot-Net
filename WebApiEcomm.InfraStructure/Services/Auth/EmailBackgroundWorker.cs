@@ -32,7 +32,7 @@ namespace WebApiEcomm.InfraStructure.Services.Auth
                     {
                         using var scope = _scopeFactory.CreateScope();
                         var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
-                        await emailService.SendEmailAsync(email, stoppingToken);
+                        await emailService.SendEmail(email);
                         sent = true;
                     }
                     catch (Exception ex)

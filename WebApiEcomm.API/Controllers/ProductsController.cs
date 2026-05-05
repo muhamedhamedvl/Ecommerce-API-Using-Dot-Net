@@ -107,6 +107,11 @@ namespace WebApiEcomm.API.Controllers
                 var product = await _work.ProductRepository
                     .GetByIdAsync(productId, x => x.Photos, x => x.Category);
 
+                if (product is null)
+                {
+                    return NotFound(new ResponseApi(404, "Product not found."));
+                }
+
                 await _work.ProductRepository.DeleteAsync(product);
 
                 return NoContent();

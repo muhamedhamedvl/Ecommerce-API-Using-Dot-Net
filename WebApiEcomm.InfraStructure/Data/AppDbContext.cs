@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using WebApiEcomm.Core.Entites.Identity;
 using WebApiEcomm.Core.Entites.Order;
 using WebApiEcomm.Core.Entites.Product;
+using WebApiEcomm.InfraStructure.Entities.Auth;
 namespace WebApiEcomm.InfraStructure.Data
 {
     public class AppDbContext : IdentityDbContext<AppUser>
@@ -22,6 +23,8 @@ namespace WebApiEcomm.InfraStructure.Data
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderItem> OrderItems { get; set; }
         public virtual DbSet<DeliveryMethod> DeliveryMethods { get; set; }
+        public virtual DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+        public virtual DbSet<EmailVerificationEntity> EmailVerificationCodes { get; set; }
        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -5,7 +5,7 @@ namespace WebApiEcomm.API.Controllers
 {
     [Route("errors/{statusCode}")]
     [ApiController]
-    public class errorController : ControllerBase
+    public class ErrorController : ControllerBase
     {
         [HttpGet]
         public IActionResult HandleError(int statusCode)

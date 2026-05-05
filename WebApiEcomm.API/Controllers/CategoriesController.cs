@@ -54,7 +54,7 @@ namespace WebApiEcomm.API.Controllers
                 var category = await _work.CategoryRepository.GetByIdAsync(categoryId);
                 if (category == null)
                 {
-                    return BadRequest(new ResponseApi(400));
+                    return NotFound(new ResponseApi(404, "Category not found."));
                 }
                 return Ok(category);
             }
@@ -109,6 +109,10 @@ namespace WebApiEcomm.API.Controllers
             try
             {
                 var category = await _work.CategoryRepository.GetByIdAsync(categoryId);
+                if (category is null)
+                {
+                    return NotFound(new ResponseApi(404, "Category not found."));
+                }
                 await _work.CategoryRepository.DeleteAsync(category);
                 return NoContent();
             }

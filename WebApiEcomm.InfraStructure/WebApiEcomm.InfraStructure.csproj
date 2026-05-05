@@ -26,9 +26,12 @@
 		<!-- Dependency Injection & Identity Core -->
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.8" />
 
 		<!-- File Providers -->
-		<PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.7" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.8" />
 
 		<!-- JWT & Tokens -->

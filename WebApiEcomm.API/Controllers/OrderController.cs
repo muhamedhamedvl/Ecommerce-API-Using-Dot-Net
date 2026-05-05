@@ -20,9 +20,14 @@ namespace WebApiEcomm.API.Controllers
             _orderService = orderService;
         }
         [HttpPost]
-        public async Task<ActionResult> create(OrderDto orderDTO)
+        public async Task<ActionResult> Create(OrderDto orderDTO)
         {
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Unauthorized(new ResponseApi(401, "User not authenticated"));
+            }
 
             Order order = await _orderService.CreateOrdersAsync(orderDTO, email);
 
@@ -34,6 +39,10 @@ namespace WebApiEcomm.API.Controllers
         public async Task<ActionResult> GetOrders([FromQuery] PaginationParams paginationParams)
         {
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Unauthorized(new ResponseApi(401, "User not authenticated"));
+            }
             var orders = await _orderService.GetAllOrdersForUserAsync(email);
             
             // Apply pagination
@@ -51,7 +60,15 @@ namespace WebApiEcomm.API.Controllers
         public async Task<ActionResult<OrderToReturnDTO>> GetOrderById(int orderId)
         {
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Unauthorized(new ResponseApi(401, "User not authenticated"));
+            }
             var order = await _orderService.GetOrderByIdAsync(orderId, email);
+            if (order is null)
+            {
+                return NotFound(new ResponseApi(404, "Order not found."));
+            }
             return Ok(order);
         }
 

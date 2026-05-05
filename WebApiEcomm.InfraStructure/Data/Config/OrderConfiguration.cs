@@ -15,6 +15,10 @@ namespace WebApiEcomm.InfraStructure.Data.Config
             builder.HasMany(x => x.orderItems)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(x => x.SubTotal)
+                .HasColumnType("decimal(18,2)");
+
             builder.Property(x => x.status)
                 .HasConversion(
                     o => o.ToString(),

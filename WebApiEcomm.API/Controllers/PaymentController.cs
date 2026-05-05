@@ -10,17 +10,18 @@ namespace WebApiEcomm.API.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
-    public class paymentController : ControllerBase
+    public class PaymentController : ControllerBase
     {
         private readonly IPaymentService paymentService;
-        public paymentController(IPaymentService paymentService)
+        public PaymentController(IPaymentService paymentService)
         {
             this.paymentService = paymentService;
         }
         [HttpPost("baskets/{basketId}")]
-        public async Task<ActionResult<CustomerBasket>> Create(string basketId , int deliveryid )
+        public async Task<ActionResult<CustomerBasket>> Create(string basketId, [FromQuery] int deliveryId)
         {
-            return await paymentService.CreateOrUpdatePaymentAsync(basketId , deliveryid);
+            var basket = await paymentService.CreateOrUpdatePaymentAsync(basketId, deliveryId);
+            return basket is null ? NotFound() : Ok(basket);
         }
     }
 }

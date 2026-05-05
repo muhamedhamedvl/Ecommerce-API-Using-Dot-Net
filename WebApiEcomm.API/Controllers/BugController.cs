@@ -13,10 +13,10 @@ namespace WebApiEcomm.API.Controllers
     /// - /bad-request → returns 400 Bad Request
     /// </summary>
     [ApiController]
-    [Route("api/v1/[controller]")]
-    public class bugcontroller : BaseController
+    [Route("api/v1/bug")]
+    public class BugController : BaseController
     {
-        public bugcontroller(IUnitOfWork work, IMapper mapper) : base(work, mapper)
+        public BugController(IUnitOfWork work, IMapper mapper) : base(work, mapper)
         {
         }
 
@@ -46,18 +46,18 @@ namespace WebApiEcomm.API.Controllers
         /// Simulates a 400 Bad Request error with parameter.
         /// </summary>
         [HttpGet("bad-request/{id}")]
-        public async Task<IActionResult> GetBadRequest(int id)
+        public Task<IActionResult> GetBadRequest(int id)
         {
-            return Ok();
+            return Task.FromResult<IActionResult>(BadRequest());
         }
 
         /// <summary>
         /// Simulates a 400 Bad Request error without parameter.
         /// </summary>
         [HttpGet("bad-request")]
-        public async Task<IActionResult> GetBadRequest()
+        public Task<IActionResult> GetBadRequest()
         {
-            return BadRequest();
+            return Task.FromResult<IActionResult>(BadRequest());
         }
     }
 }

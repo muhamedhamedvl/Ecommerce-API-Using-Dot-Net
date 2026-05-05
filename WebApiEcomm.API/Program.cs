@@ -44,7 +44,7 @@ namespace WebApiEcomm.API
                 { 
                     Title = "E-Commerce API", 
                     Version = "v1",
-                    Description = "E-Commerce API with JWT Authentication"
+                    Description = "E-Commerce API"
                 });
 
                 // Add JWT Authentication to Swagger
@@ -90,13 +90,14 @@ namespace WebApiEcomm.API
                 .AddDefaultTokenProviders();
 
             // Configure JWT Authentication
-            var jwtSecret = builder.Configuration["Token:Secret"];
-            var jwtIssuer = builder.Configuration["Token:Issuer"];
-            var jwtAudience = builder.Configuration["Token:Audience"];
+            // Prefer "Jwt:*" but keep backward-compatibility with older "Token:*"
+            var jwtSecret = builder.Configuration["Jwt:Secret"] ?? builder.Configuration["Token:Secret"];
+            var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? builder.Configuration["Token:Issuer"];
+            var jwtAudience = builder.Configuration["Jwt:Audience"] ?? builder.Configuration["Token:Audience"];
 
             if (string.IsNullOrEmpty(jwtSecret))
             {
-                throw new InvalidOperationException("JWT Secret is not configured in appsettings.json");
+                throw new InvalidOperationException("JWT Secret is not configured. Set 'Jwt:Secret' (or legacy 'Token:Secret') in configuration.");
             }
 
             builder.Services.AddAuthentication(options =>
