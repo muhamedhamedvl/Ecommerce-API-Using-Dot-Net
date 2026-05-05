@@ -348,23 +348,6 @@ dotnet test
 - ✅ Service layer tests
 - ✅ DTO validation tests
 
----
-
-## 🔄 System Architecture Flow
-
-```mermaid
-graph LR
-    A[Client/Frontend] -->|HTTP Request| B[API Controllers]
-    B -->|Uses| C[Services/Auth]
-    C -->|Implements| D[Repository Pattern]
-    D -->|Queries via| E[(SQL Server)]
-    B -->|Cache Operations| F[(Redis)]
-    B -->|Payment| G[Stripe API]
-    G -->|Webhook| B
-    C -->|Sends| H[Email Service]
-```
-
----
 
 ## 💡 Key Technical Achievements
 
