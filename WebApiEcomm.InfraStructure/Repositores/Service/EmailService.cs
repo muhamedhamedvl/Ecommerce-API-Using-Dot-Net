@@ -1,55 +1,59 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Logging;
 using MimeKit;
-using System;
-using System.Threading.Tasks;
 using WebApiEcomm.Core.Entites.Dtos;
 using WebApiEcomm.Core.Services;
+using WebApiEcomm.InfraStructure.Configuration;
 
 namespace WebApiEcomm.InfraStructure.Repositores.Service
 {
     public class EmailService : IEmailService
     {
-        private readonly IConfiguration _configuration;
+        private readonly EmailSmtpMergedSettings _smtp;
+        private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IConfiguration configuration)
+        public EmailService(EmailSmtpMergedSettings smtp, ILogger<EmailService> logger)
         {
-            _configuration = configuration;
+            _smtp = smtp;
+            _logger = logger;
         }
 
         public async Task SendEmail(EmailDto emailDto)
         {
-            var mimeMessage = new MimeMessage();
-            mimeMessage.From.Add(new MailboxAddress("My Ecom", _configuration["EmailSetting:From"]));
+            if (string.IsNullOrWhiteSpace(_smtp.Host))
+            {
+                _logger.LogWarning("SMTP host not configured; skipping email send to {To}", emailDto.To);
+                return;
+            }
+
+            using var mimeMessage = new MimeMessage();
+            mimeMessage.From.Add(new MailboxAddress(_smtp.FromName, string.IsNullOrWhiteSpace(emailDto.From) ? _smtp.FromAddress : emailDto.From));
             mimeMessage.To.Add(new MailboxAddress(emailDto.To, emailDto.To));
             mimeMessage.Subject = emailDto.Subject;
-            mimeMessage.Body = new TextPart("html")
+            mimeMessage.Body = new TextPart("html") { Text = emailDto.Content };
+
+            using var smtp = new MailKit.Net.Smtp.SmtpClient();
+
+            try
             {
-                Text = emailDto.Content
-            };
+                var socketOpts = _smtp.ResolveSecureSocketOption();
+                await smtp.ConnectAsync(_smtp.Host, _smtp.Port, socketOpts).ConfigureAwait(false);
 
-            using (var smtp = new MailKit.Net.Smtp.SmtpClient())
+                if (!string.IsNullOrWhiteSpace(_smtp.UserName))
+                {
+                    await smtp.AuthenticateAsync(_smtp.UserName, _smtp.Password).ConfigureAwait(false);
+                }
+
+                await smtp.SendAsync(mimeMessage).ConfigureAwait(false);
+            }
+            catch (Exception ex)
             {
-                try
-                {
-                    await smtp.ConnectAsync(
-                        _configuration["EmailSetting:Smtp"],
-                        int.Parse(_configuration["EmailSetting:Port"]),
-                        true);
-
-                    await smtp.AuthenticateAsync(
-                        _configuration["EmailSetting:UserName"],
-                        _configuration["EmailSetting:Password"]);
-
-                    await smtp.SendAsync(mimeMessage);
-                }
-                catch (Exception)
-                {
-                    throw new Exception("Email could not be sent. Please check your email settings.");
-                }
-                finally
-                {
-                    await smtp.DisconnectAsync(true);
-                }
+                _logger.LogError(ex, "Failed to send email to {To}", emailDto.To);
+                throw new InvalidOperationException("Email could not be sent. Please verify SMTP configuration.", ex);
+            }
+            finally
+            {
+                if (smtp.IsConnected)
+                    await smtp.DisconnectAsync(true).ConfigureAwait(false);
             }
         }
     }

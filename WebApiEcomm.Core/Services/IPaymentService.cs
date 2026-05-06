@@ -9,6 +9,6 @@ namespace WebApiEcomm.Core.Services
 {
     public interface IPaymentService
     {
-        Task<CustomerBasket> CreateOrUpdatePaymentAsync(string basketId , int deliveryMethodId);
+        Task<CustomerBasket?> CreateOrUpdatePaymentAsync(string basketId, int deliveryMethodId);
     }
 }

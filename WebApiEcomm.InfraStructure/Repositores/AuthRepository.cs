@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Org.BouncyCastle.Crypto.Macs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiEcomm.Core.Entites.Dtos;
 using WebApiEcomm.Core.Entites.Identity;
 using WebApiEcomm.Core.Interfaces.Auth;
 using WebApiEcomm.Core.Services;
+using WebApiEcomm.InfraStructure.Configuration;
 
 namespace WebApiEcomm.InfraStructure.Repositores
 {
@@ -16,13 +17,16 @@ namespace WebApiEcomm.InfraStructure.Repositores
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IEmailService _emailService;
-        private readonly SignInManager<AppUser> _signInManager;
+        private readonly EmailSmtpMergedSettings _smtp;
 
-        public AuthRepository(UserManager<AppUser> userManager, IEmailService emailService, SignInManager<AppUser> signInManager)
+        public AuthRepository(
+            UserManager<AppUser> userManager,
+            IEmailService emailService,
+            EmailSmtpMergedSettings smtp)
         {
             _userManager = userManager;
             _emailService = emailService;
-            _signInManager = signInManager;
+            _smtp = smtp;
         }
         public async Task<AppUser> RegisterAsync(RegisterDto registerDto)
         {
@@ -50,7 +54,12 @@ namespace WebApiEcomm.InfraStructure.Repositores
             }
             //Send email confirmation
             string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            await SendEmail(user.Email, code, "active", "ActiveEmail", "Active your email,click on button to active");
+            await SendEmail(
+                user.Email,
+                code,
+                "Email verification",
+                $"<p>Please confirm your account for <strong>{WebUtility.HtmlEncode(user.Email)}</strong>.</p>",
+                "Use the verification code below to confirm your email.");
             return user;
         }
         public async Task SendEmail(string email, string code, string component, string content, string message)
@@ -64,20 +73,36 @@ namespace WebApiEcomm.InfraStructure.Repositores
                 throw new ArgumentException("Email, code, component, content, and message must not be empty");
             }
 
-            // Example: subject based on component
-            string subject = $"Verification for {component}";
+            string subject = string.IsNullOrWhiteSpace(component) ? "Verification" : $"Verification — {component}";
 
-            // Format the content (replace placeholders in the template)
-            string formattedContent = string.Format(content, email, code, component, message);
+            var body = ResolveEmailBody(email, code, component, content, message);
 
             var emailDto = new EmailDto(
                 to: email,
-                from: "mh1191128@gmail.com",
+                from: string.IsNullOrWhiteSpace(_smtp.FromAddress) ? email : _smtp.FromAddress,
                 subject: subject,
-                content: formattedContent
+                content: body
             );
 
             await _emailService.SendEmail(emailDto);
+        }
+
+        private static string ResolveEmailBody(string email, string code, string component, string content, string message)
+        {
+            if (!string.IsNullOrWhiteSpace(content) && content.Contains('<', StringComparison.Ordinal))
+                return content;
+
+            var safeMessage = WebUtility.HtmlEncode(message);
+            var safeCode = WebUtility.HtmlEncode(code);
+            var safeEmail = WebUtility.HtmlEncode(email);
+            var safeComponent = WebUtility.HtmlEncode(component);
+
+            return $"""
+                <p>{safeMessage}</p>
+                <p><strong>Code:</strong> {safeCode}</p>
+                <p><strong>For:</strong> {safeEmail}</p>
+                <p><strong>Type:</strong> {safeComponent}</p>
+                """;
         }
         public async Task<AppUser> LoginAsync(LoginDto loginDto)
         {
@@ -85,16 +110,18 @@ namespace WebApiEcomm.InfraStructure.Repositores
             {
                 throw new ArgumentNullException(nameof(loginDto));
             }
-            var user = await _userManager.FindByEmailAsync(loginDto.Email );
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user == null)
             {
                 throw new ArgumentException("Invalid username or password");
             }
-            var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
-            if (!result.Succeeded)
+
+            // JWT API: validate password with UserManager only. Do not use SignInManager.PasswordSignInAsync — that requires cookie auth (Identity.Application).
+            if (!await _userManager.CheckPasswordAsync(user, loginDto.Password).ConfigureAwait(false))
             {
                 throw new InvalidOperationException("Login failed");
             }
+
             return user;
         }
 

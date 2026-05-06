@@ -23,7 +23,7 @@ namespace WebApiEcomm.InfraStructure.Repositores
              return _database.KeyDeleteAsync(id);
         }
 
-        public async Task<CustomerBasket> GetCustomerBasketAsync(string id)
+        public async Task<CustomerBasket?> GetCustomerBasketAsync(string id)
         {
             var res = await _database.StringGetAsync(id);
             if (!string.IsNullOrEmpty(res)) 
@@ -33,7 +33,7 @@ namespace WebApiEcomm.InfraStructure.Repositores
             return null; 
         }
 
-        public async Task<CustomerBasket> UpdateCustomerBasketAsync(CustomerBasket customerBasket)
+        public async Task<CustomerBasket?> UpdateCustomerBasketAsync(CustomerBasket customerBasket)
         {
             var _basket = await _database.StringSetAsync(customerBasket.Id , JsonSerializer.Serialize(customerBasket) , TimeSpan.FromDays(3));
             if (customerBasket != null) 

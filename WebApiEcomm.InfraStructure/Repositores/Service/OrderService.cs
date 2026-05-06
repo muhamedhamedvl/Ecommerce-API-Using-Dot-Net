@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Stripe;
 using WebApiEcomm.Core.Entites.Dtos;
 using WebApiEcomm.Core.Entites.Order;
 using WebApiEcomm.Core.Interfaces.IUnitOfWork;
@@ -26,18 +25,31 @@ namespace WebApiEcomm.InfraStructure.Repositores.Service
         public async Task<Order> CreateOrdersAsync(OrderDto orderDTO, string BuyerEmail)
         {
             var basket = await _unitOfWork.CustomerBasketRepository.GetCustomerBasketAsync(orderDTO.basketId);
+            if (basket is null)
+            {
+                throw new InvalidOperationException("Basket not found or has expired.");
+            }
 
             List<OrderItem> orderItems = new List<OrderItem>();
 
             foreach (var item in basket.basketItems)
             {
                 var Product = await _unitOfWork.ProductRepository.GetByIdAsync(item.Id);
+                if (Product is null)
+                {
+                    throw new InvalidOperationException($"Basket contains an unknown product id {item.Id}.");
+                }
+
                 var orderItem = new OrderItem
                     (Product.Id, item.Image, Product.Name, item.Price, item.Quantity);
                 orderItems.Add(orderItem);
 
             }
             var deliverMethod = await _context.DeliveryMethods.FirstOrDefaultAsync(m => m.Id == orderDTO.DelliveryMethodId);
+            if (deliverMethod is null)
+            {
+                throw new InvalidOperationException("Delivery method is not valid.");
+            }
 
             var subTotal = orderItems.Sum(m => m.Price * m.Quntity);
 
@@ -48,7 +60,7 @@ namespace WebApiEcomm.InfraStructure.Repositores.Service
             if (ExisitOrder is not null)
             {
                 _context.Orders.Remove(ExisitOrder);
-                await _paymentService.CreateOrUpdatePaymentAsync(basket.PaymentIntentId, deliverMethod.Id);
+                await _paymentService.CreateOrUpdatePaymentAsync(orderDTO.basketId, deliverMethod.Id);
             }
 
             var order = new

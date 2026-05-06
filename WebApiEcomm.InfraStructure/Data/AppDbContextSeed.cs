@@ -7,12 +7,19 @@ namespace WebApiEcomm.InfraStructure.Data
 {
     public class AppDbContextSeed
     {
-        public static async Task SeedAsync(AppDbContext context, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, ILogger logger)
+        public static async Task SeedAsync(
+            AppDbContext context,
+            UserManager<AppUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            ILogger logger,
+            bool applyMigrations)
         {
             try
             {
-                // Ensure database is created
-                await context.Database.MigrateAsync();
+                if (applyMigrations)
+                {
+                    await context.Database.MigrateAsync();
+                }
 
                 // Seed Roles
                 if (!await roleManager.Roles.AnyAsync())

@@ -9,10 +9,7 @@ using WebApiEcomm.InfraStructure.Data;
 using WebApiEcomm.InfraStructure.Repositories;
 using AutoMapper;
 using WebApiEcomm.Core.Services;
-using StackExchange.Redis;
 using WebApiEcomm.Core.Interfaces.Auth;
-using Microsoft.AspNetCore.Identity;
-using WebApiEcomm.Core.Entites.Identity;
 
 namespace WebApiEcomm.InfraStructure.Repositores.UnitOfWork
 {
@@ -21,11 +18,6 @@ namespace WebApiEcomm.InfraStructure.Repositores.UnitOfWork
         private readonly AppDbContext _context;
         private readonly IMapper mapper;
         private readonly IImageManagementService imageManagementService;
-        private readonly IConnectionMultiplexer redis;
-        private readonly UserManager<AppUser> userManager;
-        private readonly IEmailService emailService;
-        private readonly SignInManager<AppUser> signInManager;  
-        private readonly IGenrateToken genrateToken;
 
 
         public ICategoryRepository CategoryRepository { get; }
@@ -38,22 +30,21 @@ namespace WebApiEcomm.InfraStructure.Repositores.UnitOfWork
 
         public IAuth Auth { get; }
 
-        public UnitOfWork(AppDbContext context, IMapper mapper, IImageManagementService imageManagementService
-             , IConnectionMultiplexer redis, UserManager<AppUser> userManager, IEmailService emailService, SignInManager<AppUser> signInManager, IGenrateToken genrateToken)
+        public UnitOfWork(
+            AppDbContext context,
+            IMapper mapper,
+            IImageManagementService imageManagementService,
+            ICustomerBasketRepository customerBasketRepository,
+            IAuth auth)
         {
             this._context = context;
             this.mapper = mapper;
             this.imageManagementService = imageManagementService;
-            this.redis = redis;
-            this.userManager = userManager;
-            this.emailService = emailService;
-            this.signInManager = signInManager;
-            this.genrateToken = genrateToken;
             CategoryRepository = new CategoryRepository(_context);
             ProductRepository = new ProductRepository(_context, mapper, imageManagementService);
             PhotoRepository = new PhotoRepository(_context);
-            CustomerBasketRepository = new CustomerBasketRepository(redis);
-            Auth = new AuthRepository(userManager, emailService, signInManager);
+            CustomerBasketRepository = customerBasketRepository;
+            Auth = auth;
 
         }
     }
