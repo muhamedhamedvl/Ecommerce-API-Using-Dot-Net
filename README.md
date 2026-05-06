@@ -15,6 +15,11 @@
 </div>
 
 ---
+## 🚀 Live Demo
+
+🔗 **API Documentation (Swagger):**  
+👉 [View Swagger UI](https://myecommercewebapi.runasp.net/index.html)
+
 
 ## 🌟 Project Highlights
 
@@ -43,6 +48,13 @@
 - **Email verification** with confirmation tokens
 - **Resend confirmation emails**
 - Email enumeration protection for security
+
+### 📸 Project Screenshots
+
+![Account](WebapiEcommerce/Account.png)
+![Basket,Bug,Categories,Error](WebapiEcommerce/Basket,Bug,Categories,Error.png)
+![Order,Payment,Products](WebapiEcommerce/Order,Payment,Products.png)
+
 
 ### 🛍️ Product Management
 - Full CRUD operations with role-based access control
@@ -427,7 +439,7 @@ This project showcases proficiency in:
 **Senior Backend Developer | ASP.NET Core Specialist**
 
 [![Email](https://img.shields.io/badge/Email-mh1191128%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:mh1191128@gmail.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](www.linkedin.com/in/muhamed-hamed-3a2a25250)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/muhamed-hamed-3a2a25250/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/muhamedhamedvl)
 
 </div>
