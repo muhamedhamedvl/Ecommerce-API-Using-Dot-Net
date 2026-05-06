@@ -21,8 +21,14 @@ namespace WebApiEcomm.InfraStructure.Repositores.Service
         {
             if (string.IsNullOrWhiteSpace(_smtp.Host))
             {
-                _logger.LogWarning("SMTP host not configured; skipping email send to {To}", emailDto.To);
-                return;
+                _logger.LogError("SMTP host is not configured. Cannot send email to {To}", emailDto.To);
+                throw new InvalidOperationException("SMTP host is not configured. Set Email:SmtpHost (or EmailSetting:Smtp) in production configuration.");
+            }
+
+            if (string.IsNullOrWhiteSpace(_smtp.FromAddress))
+            {
+                _logger.LogError("SMTP from-address is not configured. Cannot send email to {To}", emailDto.To);
+                throw new InvalidOperationException("SMTP from-address is not configured. Set Email:FromAddress (or EmailSetting:From) in production configuration.");
             }
 
             using var mimeMessage = new MimeMessage();
@@ -48,7 +54,7 @@ namespace WebApiEcomm.InfraStructure.Repositores.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to send email to {To}", emailDto.To);
-                throw new InvalidOperationException("Email could not be sent. Please verify SMTP configuration.", ex);
+                throw new InvalidOperationException($"Email could not be sent. SMTP failure: {ex.Message}", ex);
             }
             finally
             {

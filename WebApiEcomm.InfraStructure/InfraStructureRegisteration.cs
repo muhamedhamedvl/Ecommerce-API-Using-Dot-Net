@@ -18,6 +18,7 @@ namespace WebApiEcomm.InfraStructure
     {
         public static IServiceCollection InfrastructureConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
             services.AddSingleton(_ => EmailSmtpMergedSettings.FromConfiguration(configuration));
             services.AddSingleton(_ => StripeMergedSettings.FromConfiguration(configuration));
 

@@ -46,6 +46,11 @@ namespace WebApiEcomm.InfraStructure.Repositores
             {
                 UserName = registerDto.UserName,
                 Email = registerDto.Email,
+                DisplayName = registerDto.UserName,
+                // Keep identity required profile fields non-null to satisfy DB constraints.
+                City = string.Empty,
+                State = string.Empty,
+                ZipCode = string.Empty
             };
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded)

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 namespace WebApiEcomm.InfraStructure.Configuration
 {
     /// <summary>
-    /// SMTP settings merged from <c>Email:*</c> and legacy <c>EmailSetting:*</c>.
+    /// SMTP settings merged from <c>Email:*</c>, <c>EmailSettings:*</c>, and legacy <c>EmailSetting:*</c>.
     /// </summary>
     public sealed class EmailSmtpMergedSettings
     {
@@ -19,30 +19,41 @@ namespace WebApiEcomm.InfraStructure.Configuration
         public static EmailSmtpMergedSettings FromConfiguration(IConfiguration configuration)
         {
             var email = configuration.GetSection("Email");
+            var emailSettings = configuration.GetSection("EmailSettings");
             var legacy = configuration.GetSection("EmailSetting");
 
             var fromAddr = email["FromAddress"]
+                         ?? emailSettings["From"]
                          ?? legacy["From"]
                          ?? string.Empty;
 
             var fromName = email["FromName"]
+                           ?? emailSettings["FromName"]
                            ?? legacy["FromName"]
                            ?? "WebApiEcomm";
 
             var host = email["SmtpHost"]
+                       ?? emailSettings["Host"]
                        ?? legacy["Smtp"]
                        ?? string.Empty;
 
+            var emailSettingsPortOk = TryParsePort(emailSettings["Port"], out var emailSettingsPort);
             var legacyPortOk = TryParsePort(legacy["Port"], out var legacyPort);
             var emailPortOk = TryParsePort(email["Port"], out var emailPort);
-            var port = emailPortOk ? emailPort : (legacyPortOk ? legacyPort : 587);
+            var port = emailPortOk
+                ? emailPort
+                : (emailSettingsPortOk ? emailSettingsPort : (legacyPortOk ? legacyPort : 587));
 
-            var userName = email["UserName"] ?? legacy["UserName"] ?? string.Empty;
-            var password = email["Password"] ?? legacy["Password"] ?? string.Empty;
+            var userName = email["UserName"] ?? emailSettings["UserName"] ?? legacy["UserName"] ?? string.Empty;
+            var password = email["Password"] ?? emailSettings["Password"] ?? legacy["Password"] ?? string.Empty;
 
             var legacyUseSslParse = legacy["UseSsl"] is { } lu && bool.TryParse(lu, out var lssl) ? lssl : (bool?)null;
             var emailUseSslParse = email["UseSsl"] is { } eu && bool.TryParse(eu, out var essl) ? essl : (bool?)null;
-            var useSsl = legacyUseSslParse ?? emailUseSslParse ?? false;
+            var emailSettingsUseSslParse =
+                emailSettings["EnableSSL"] is { } es && bool.TryParse(es, out var esssl)
+                    ? esssl
+                    : (bool?)null;
+            var useSsl = emailUseSslParse ?? emailSettingsUseSslParse ?? legacyUseSslParse ?? false;
 
             return new EmailSmtpMergedSettings
             {

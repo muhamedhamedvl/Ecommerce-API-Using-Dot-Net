@@ -116,6 +116,10 @@ namespace WebApiEcomm.API
                 lb.AddDebug();
             });
             var jwtStartupLogger = jwtBootstrapLoggerFactory.CreateLogger<Program>();
+            jwtStartupLogger.LogInformation(
+                "SMTP config keys at startup: Email:SmtpHost='{EmailSmtpHost}', Email:Port='{EmailPort}'",
+                builder.Configuration["Email:SmtpHost"] ?? "(null)",
+                builder.Configuration["Email:Port"] ?? "(null)");
 
             var (resolvedSecretRaw, resolvedSecretSource) = JwtSecretResolver.Resolve(builder.Configuration);
 
