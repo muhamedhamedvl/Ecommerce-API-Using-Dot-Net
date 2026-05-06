@@ -206,12 +206,12 @@ namespace WebApiEcomm.API
             app.UseForwardedHeaders();
 
             app.UseSerilogRequestLogging();
-
-            if (app.Environment.IsDevelopment())
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "E-Commerce API V1");
+                c.RoutePrefix = ""; 
+            });
 
             // IIS / reverse proxies: forward X-Forwarded-Proto first (above). Disable redirection if terminating TLS upstream.
             if (!app.Configuration.GetValue("Hosting:DisableHttpsRedirection", false))
