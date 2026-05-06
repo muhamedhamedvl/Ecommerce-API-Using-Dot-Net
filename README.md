@@ -44,6 +44,13 @@
 - **Resend confirmation emails**
 - Email enumeration protection for security
 
+### 📸 Project Screenshots
+
+![Account](WebapiEcommerce/Account.png)
+![Basket,Bug,Categories,Error](WebapiEcommerce/Basket,Bug,Categories,Error.png)
+![Order,Payment,Products](WebapiEcommerce/Order,Payment,Products.png)
+
+
 ### 🛍️ Product Management
 - Full CRUD operations with role-based access control
 - **Advanced filtering & sorting** using Specification Pattern
